@@ -108,11 +108,26 @@ section.on{display:block}
 .chg.flat{background:#eef1f4;color:var(--sub)}
 .wmeta{color:var(--sub);font-size:12.5px;margin-left:auto;text-align:right}
 
-/* ---------- quick actions ---------- */
-.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:16px}
-.act{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:12px;background:#fafbfc;border:1px solid var(--line);font-size:13px;font-weight:600;transition:.15s}
-.act:hover{border-color:var(--acc);background:var(--acc-soft);color:var(--acc-deep)}
-.act .ic{font-size:19px;line-height:1}
+/* ---------- record tiles ---------- */
+.badge{background:var(--acc-soft);color:var(--acc-deep);padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.recgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rec-tile{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:14px;border-radius:14px;border:1.5px dashed #c6d0da;background:#fafcfc;text-align:left;transition:.15s}
+.rec-tile:hover{border-color:var(--acc);background:var(--acc-soft)}
+.rec-tile .ric{font-size:21px;line-height:1}
+.rec-tile .rl{font-size:12px;color:var(--sub);font-weight:600;margin-top:3px}
+.rec-tile .rv{font-size:19px;font-weight:800;font-family:var(--mono);letter-spacing:-.5px;color:#b6c0cc;margin-top:2px}
+.rec-tile .rv small{font-size:11px;font-weight:600;color:var(--sub);margin-left:2px;letter-spacing:0;font-family:inherit}
+.rec-tile .rs{font-size:11px;font-weight:600;color:var(--acc-deep)}
+.rec-tile.done{border:1.5px solid var(--line);background:#fff;box-shadow:var(--sh)}
+.rec-tile.done .rv{color:var(--ink)}
+.rec-tile.done .rs{color:#9aa5b3}
+.rec-sub{display:flex;gap:9px;margin-top:12px}
+.rec-sub .btn{flex:1}
+@media(max-width:430px){
+  .recgrid{gap:7px}
+  .rec-tile{padding:12px 10px}
+  .rec-tile .rv{font-size:16px}
+}
 
 /* ---------- list rows ---------- */
 .rows{display:flex;flex-direction:column}
@@ -254,6 +269,23 @@ hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
     </div>
 
     <div class="card">
+      <div class="sec-head">
+        <div class="t"><h2>✍️ 记录打卡</h2><p class="hint">只有这 3 项需要手动记 · 点进去记录，记过再点是修改</p></div>
+        <span class="badge" id="doneBadge">0/3</span>
+      </div>
+      <div class="recgrid">
+        <button class="rec-tile" id="btnWeight"><span class="ric">⚖️</span><span class="rl">体重</span><span class="rv" id="rwV">未记录</span><span class="rs" id="rwS">去记录 ›</span></button>
+        <button class="rec-tile" id="btnFood"><span class="ric">🍚</span><span class="rl">饮食摄入</span><span class="rv" id="rfV">未记录</span><span class="rs" id="rfS">去记录 ›</span></button>
+        <button class="rec-tile" id="btnEx"><span class="ric">🏃</span><span class="rl">运动消耗</span><span class="rv" id="reV">未记录</span><span class="rs" id="reS">去记录 ›</span></button>
+      </div>
+      <div class="rec-sub">
+        <button class="btn ghost sm" id="btnQuick">⚡ 复制昨天</button>
+        <button class="btn ghost sm" id="btnShare">📣 分享卡片</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-head"><div class="t"><h2>📊 今日概览</h2><p class="hint">以下由记录自动汇总，无需手动填写</p></div></div>
       <div class="top">
         <div class="ring" id="ring"></div>
         <div class="metrics">
@@ -261,13 +293,6 @@ hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
           <div class="metric"><span class="l"><i class="dot" style="background:#4a90d9"></i>运动消耗</span><span class="v" id="mOut">0<small>kcal</small></span></div>
           <div class="metric"><span class="l"><i class="dot" style="background:#12a594"></i>今日预算</span><span class="v" id="mBudget">—<small>kcal</small></span></div>
         </div>
-      </div>
-      <div class="acts">
-        <button class="act" id="btnWeight"><span class="ic">⚖️</span>记体重</button>
-        <button class="act" id="btnFood"><span class="ic">🍚</span>记饮食</button>
-        <button class="act" id="btnEx"><span class="ic">🏃</span>记运动</button>
-        <button class="act" id="btnQuick"><span class="ic">⚡</span>快捷复制</button>
-        <button class="act" id="btnShare"><span class="ic">📣</span>分享卡片</button>
       </div>
     </div>
 
@@ -570,6 +595,7 @@ function defaults(){
     recentF:[], recentE:[],
     customF:[], customE:[],
     shareUrl:"",
+    shareShowWeight:true,
     created:today()
   };
 }
@@ -675,6 +701,13 @@ function met2kcal(met,mins){
 }
 
 /* ---------- 渲染：今日 ---------- */
+function setTile(vId,sId,done,valHtml,doneTxt){
+  const t=$("#"+vId).closest(".rec-tile");
+  t.classList.toggle("done",!!done);
+  $("#"+vId).innerHTML = done? valHtml : "未记录";
+  $("#"+sId).textContent = done? doneTxt : "去记录 ›";
+  return done?1:0;
+}
 function renderToday(){
   $("#curDate").textContent = niceDate(CUR);
   const d=parseKey(CUR);
@@ -687,6 +720,12 @@ function renderToday(){
   $("#mOut").innerHTML = out+"<small>kcal</small>";
   $("#mBudget").innerHTML = (b||"—")+"<small>kcal</small>";
   drawRing(b,inn,rem);
+
+  let dn=0;
+  dn+=setTile("rwV","rwS", r.weight!=null, r.weight+'<small>kg</small>', "✓ 已记 · 点击修改");
+  dn+=setTile("rfV","rfS", r.foods.length>0, inn+'<small>kcal</small>', "✓ "+r.foods.length+" 条 · 点击增改");
+  dn+=setTile("reV","reS", r.exs.length>0, '-'+out+'<small>kcal</small>', "✓ "+r.exs.length+" 条 · 点击增改");
+  $("#doneBadge").textContent = dn===3? "🎉 3/3" : dn+"/3";
 
   /* 体重 */
   const wb=$("#weightBox");
@@ -1322,17 +1361,12 @@ function shareCardCanvas(){
 
   const ws=weightSeries(0), lw=latestWeight();
   const lost=ws.length>1? r1(ws[0].w-ws[ws.length-1].w):0;
-  const d7=kDays(7).filter(v=>v.inn);
-  const avg7=d7.length? r0(d7.reduce((s,v)=>s+v.inn,0)/d7.length):0;
-  const stats=[
-    ["累计减重", lost>0? "-"+lost+" kg":(lost<0? "+"+Math.abs(lost)+" kg":"0 kg")],
-    ["当前体重", lw? lw.w+" kg":"—"],
-    ["7日均摄入", avg7? avg7+" kcal":"—"]
-  ];
+  const stats=[["累计减/增重", lost>0? "-"+lost+" kg":(lost<0? "+"+Math.abs(lost)+" kg":"0 kg")]];
+  if(S.shareShowWeight!==false && lw) stats.push(["当前体重", lw.w+" kg"]);
   stats.forEach((s,i)=>{
-    const cx=60+i*220;
+    const cx=60+i*310;
     x.fillStyle="rgba(255,255,255,.7)"; x.font="400 24px "+F; x.fillText(s[0],cx,436);
-    x.fillStyle="#fff"; x.font="700 44px "+F; x.fillText(s[1],cx,486);
+    x.fillStyle="#fff"; x.font="700 48px "+F; x.fillText(s[1],cx,490);
   });
 
   rr(x,60,540,630,230,22); x.fillStyle="rgba(255,255,255,.10)"; x.fill();
@@ -1388,10 +1422,16 @@ function openShare(){
   const cv=shareCardCanvas();
   const data=cv.toDataURL("image/png");
   openSheet("分享打卡卡片",
+    '<label style="display:flex;gap:8px;align-items:center;justify-content:center;margin:0 0 12px;font-size:13px;color:var(--sub)">'+
+      '<input type="checkbox" id="scW" '+(S.shareShowWeight!==false?"checked":"")+'>卡片上展示当前体重</label>'+
     '<div style="text-align:center"><img id="scImg" alt="分享卡片预览" style="max-width:100%;border-radius:16px;box-shadow:0 8px 30px rgba(16,24,40,.18)"></div>'+
     '<p class="hint" style="margin:12px 0 0;text-align:center">手机：长按图片保存或转发朋友圈／社群<br>电脑：点下方「保存 PNG」</p>',
     '<div class="rowbtns"><button class="btn ghost" id="scClose">关闭</button><button class="btn pri" id="scSave">保存 PNG</button></div>');
   $("#scImg").src=data;
+  $("#scW").onchange=e=>{
+    S.shareShowWeight=e.target.checked; save();
+    $("#scImg").src=shareCardCanvas().toDataURL("image/png");
+  };
   $("#scClose").onclick=closeSheet;
   $("#scSave").onclick=()=>{
     const a=document.createElement("a");
