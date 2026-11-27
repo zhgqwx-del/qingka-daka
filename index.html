@@ -820,7 +820,7 @@ function weightSeries(range){
 }
 function renderTrend(){
   const ws=weightSeries(wRange);
-  $("#wChart").innerHTML = ws.length>=2? lineChart(ws) : '<div class="empty">至少需要 2 次体重记录才能画出曲线</div>';
+  $("#wChart").innerHTML = ws.length>=2? lineChart(ws) : '<div class="empty">至少需要 2 次体重记录才能画出曲线<br><span style="font-size:12px">提示：用「今日」页顶部的日期切换 ‹ › 可以补记过去的体重</span></div>';
   if(ws.length){
     const first=ws[0].w,last=ws[ws.length-1].w,dv=r1(last-first);
     const avg=r1(ws.reduce((s,x)=>s+x.w,0)/ws.length);
@@ -1372,10 +1372,13 @@ function shareCardCanvas(){
   x.font="600 44px "+F; x.fillText("天",66+sw,338);
 
   const ws=weightSeries(0), lw=latestWeight();
-  const delta=ws.length>1? r1(ws[0].w-ws[ws.length-1].w):0;   // 正=变瘦
-  const stats=[ delta>0? ["累计减重","↓ "+delta+" kg"]
-              : delta<0? ["累计增重","↑ "+Math.abs(delta)+" kg"]
-              : ["体重变化","0 kg"] ];
+  const stats=[];
+  if(ws.length>1){
+    const delta=r1(ws[0].w-ws[ws.length-1].w);   // 正=变瘦
+    stats.push(delta>0? ["累计减重","↓ "+delta+" kg"]
+             : delta<0? ["累计增重","↑ "+Math.abs(delta)+" kg"]
+             : ["体重变化","0 kg"]);
+  }
   if(S.shareShowWeight!==false && lw) stats.push(["当前体重", lw.w+" kg"]);
   stats.forEach((s,i)=>{
     const cx=60+i*310;
