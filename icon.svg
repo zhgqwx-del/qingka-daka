@@ -7,5 +7,5 @@
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#g)"/>
   <circle cx="400" cy="112" r="120" fill="#ffffff" opacity=".10"/>
-  <text x="256" y="268" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="268" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">记</text>
+  <text x="256" y="268" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="268" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">管</text>
 </svg>
