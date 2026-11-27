@@ -239,6 +239,19 @@ footer{border-top:1px solid var(--line);padding:20px 0 30px;color:var(--sub);fon
 .rowbtns{display:flex;gap:9px;flex-wrap:wrap}
 .rowbtns .btn{flex:1;min-width:130px}
 hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
+
+/* ---------- folds ---------- */
+details.fold{border-top:1px solid var(--line);padding:12px 0}
+details.fold:first-of-type{border-top:0;padding-top:2px}
+details.fold summary{font-size:13.5px;font-weight:700;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::before{content:"›";color:var(--sub);font-size:15px;transition:.15s;display:inline-block}
+details.fold[open] summary::before{transform:rotate(90deg)}
+details.fold[open] summary{margin-bottom:9px}
+details.adv{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fafbfc}
+details.adv summary{font-size:12.5px;color:var(--sub);font-weight:600;cursor:pointer}
+details.adv[open] summary{margin-bottom:8px}
+.flink{color:var(--acc-deep);font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:2px}
 </style>
 </head>
 <body>
@@ -253,7 +266,7 @@ hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
       <button data-tab="today" class="on">今日</button>
       <button data-tab="trend">趋势</button>
       <button data-tab="plan">计划</button>
-      <button data-tab="data">数据</button>
+      <button data-tab="data">我的</button>
     </nav>
   </div>
 </header>
@@ -434,16 +447,10 @@ hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
     </div>
   </section>
 
-  <!-- ============ 数据 ============ -->
+  <!-- ============ 我的 ============ -->
   <section id="data">
     <div class="card">
-      <div class="sec-head"><div class="t"><h2>📣 分享设置</h2><p class="hint">部署网页版后把地址填在这里，分享卡片会自动带二维码</p></div></div>
-      <div class="field"><label>我的分享链接</label><input id="fShare" type="url" placeholder="如 https://qingka.example.com" autocomplete="off"></div>
-      <p class="hint" style="margin:9px 0 0">不填也能生成卡片（不含二维码）。部署方法见同目录 DEPLOY.md。</p>
-    </div>
-
-    <div class="card">
-      <div class="sec-head"><div class="t"><h2>💾 导出与备份</h2><p class="hint">数据完全属于你，随时可带走</p></div></div>
+      <div class="sec-head"><div class="t"><h2>💾 备份与恢复</h2><p class="hint">数据只存在本机浏览器，换手机/换浏览器/清缓存都靠备份</p></div></div>
       <div class="rowbtns">
         <button class="btn ghost" id="btnCsv">导出 CSV（表格）</button>
         <button class="btn ghost" id="btnJson">导出 JSON 备份</button>
@@ -455,35 +462,39 @@ hr.sp{border:0;border-top:1px solid var(--line);margin:18px 0}
       <div class="kv"><span class="k">饮食条目</span><span class="v" id="dFoods">0</span></div>
       <div class="kv"><span class="k">运动条目</span><span class="v" id="dExs">0</span></div>
       <div class="kv"><span class="k">本地占用</span><span class="v" id="dSize">0 KB</span></div>
-      <hr class="sp">
+    </div>
+
+    <div class="card">
+      <div class="sec-head"><div class="t"><h2>🔒 隐私与关于</h2><p class="hint">点击展开查看</p></div></div>
+      <details class="fold" id="foldPrivacy"><summary>隐私说明</summary>
+        <ul class="clean">
+          <li>所有数据仅存储在<b>本设备浏览器的 localStorage</b> 中，不上传任何服务器，无账号、无追踪、无第三方 SDK。</li>
+          <li>页面为纯静态单文件，可完全<b>离线使用</b>；断网状态下功能不受影响。</li>
+          <li>清除浏览器数据、更换设备或换浏览器会导致记录丢失，请<b>定期导出 JSON 备份</b>。</li>
+          <li>若在公共电脑上使用，建议用无痕窗口，离开前点击「清空全部数据」。</li>
+        </ul>
+      </details>
+      <details class="fold"><summary>关于与免责声明</summary>
+        <p style="margin:0 0 10px;font-size:13px;color:var(--sub);line-height:1.85">
+          版本 1.3 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
+        </p>
+        <p style="margin:0;font-size:13px;color:var(--sub);line-height:1.85">
+          本工具不用于预防、治疗或诊断任何疾病。使用即表示你已了解并自行承担健康决策责任。
+        </p>
+      </details>
+    </div>
+
+    <div class="card">
       <div class="rowbtns"><button class="btn danger" id="btnWipe">清空全部数据</button></div>
-    </div>
-
-    <div class="card">
-      <div class="sec-head"><div class="t"><h2>🔒 隐私说明</h2></div></div>
-      <ul class="clean">
-        <li>所有数据仅存储在<b>本设备浏览器的 localStorage</b> 中，不上传任何服务器，无账号、无追踪、无第三方 SDK。</li>
-        <li>页面为纯静态单文件，可完全<b>离线使用</b>；断网状态下功能不受影响。</li>
-        <li>清除浏览器数据、更换设备或换浏览器会导致记录丢失，请<b>定期导出 JSON 备份</b>。</li>
-        <li>若在公共电脑上使用，建议用无痕窗口，离开前点击「清空全部数据」。</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <div class="sec-head"><div class="t"><h2>ℹ️ 关于与免责声明</h2></div></div>
-      <p style="margin:0 0 10px;font-size:13px;color:var(--sub);line-height:1.85">
-        版本 1.0 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
-      </p>
-      <p style="margin:0;font-size:13px;color:var(--sub);line-height:1.85">
-        本工具不用于预防、治疗或诊断任何疾病。使用即表示你已了解并自行承担健康决策责任。
-      </p>
+      <p class="hint" style="margin:9px 0 0;text-align:center">清空不可恢复，请先导出备份</p>
     </div>
   </section>
 
 </main>
 
 <footer class="wrap">
-  轻卡打卡 · 数据仅存本机 · 非医疗器械，不构成医疗建议
+  轻卡打卡 · 数据仅存本机 · 非医疗器械，不构成医疗建议<br>
+  <button class="flink" id="footPrivacy">隐私与免责声明</button>
 </footer>
 
 <!-- ============ modal ============ -->
@@ -982,8 +993,6 @@ function renderData(){
   $("#dExs").textContent=ks.reduce((s,k)=>s+((S.records[k].exs||[]).length),0);
   const raw=localStorage.getItem(LS_KEY)||"";
   $("#dSize").textContent=(raw.length/1024).toFixed(1)+" KB";
-  const fs=$("#fShare");
-  if(fs.value!==(S.shareUrl||"")) fs.value=S.shareUrl||"";
 }
 
 function renderAll(){ renderToday(); renderTrend(); renderPlan(); renderData(); }
@@ -1425,6 +1434,10 @@ function openShare(){
     '<label style="display:flex;gap:8px;align-items:center;justify-content:center;margin:0 0 12px;font-size:13px;color:var(--sub)">'+
       '<input type="checkbox" id="scW" '+(S.shareShowWeight!==false?"checked":"")+'>卡片上展示当前体重</label>'+
     '<div style="text-align:center"><img id="scImg" alt="分享卡片预览" style="max-width:100%;border-radius:16px;box-shadow:0 8px 30px rgba(16,24,40,.18)"></div>'+
+    '<details class="adv"><summary>高级：自定义分享链接（一般不用填）</summary>'+
+      '<p class="hint" style="margin:6px 0 8px">在线版默认用当前网址生成二维码；仅当你有自定义域名时才需要改</p>'+
+      '<input id="fShare" type="url" value="'+esc(S.shareUrl||"")+'" placeholder="如 https://qingka.example.com" autocomplete="off" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:#fff">'+
+    '</details>'+
     '<p class="hint" style="margin:12px 0 0;text-align:center">手机：长按图片保存或转发朋友圈／社群<br>电脑：点下方「保存 PNG」</p>',
     '<div class="rowbtns"><button class="btn ghost" id="scClose">关闭</button><button class="btn pri" id="scSave">保存 PNG</button></div>');
   $("#scImg").src=data;
@@ -1432,6 +1445,11 @@ function openShare(){
     S.shareShowWeight=e.target.checked; save();
     $("#scImg").src=shareCardCanvas().toDataURL("image/png");
   };
+  $("#fShare").addEventListener("change",e=>{
+    S.shareUrl=e.target.value.trim(); save();
+    $("#scImg").src=shareCardCanvas().toDataURL("image/png");
+    toast(S.shareUrl? "已改用自定义链接生成二维码":"已恢复为当前网址");
+  });
   $("#scClose").onclick=closeSheet;
   $("#scSave").onclick=()=>{
     const a=document.createElement("a");
@@ -1514,9 +1532,12 @@ function bind(){
   $("#btnEx").onclick=askEx;  $("#btnEx2").onclick=askEx;
   $("#btnQuick").onclick=quickCopy;
   $("#btnShare").onclick=openShare;
-  $("#fShare").addEventListener("change",e=>{
-    S.shareUrl=e.target.value.trim(); save(); toast(S.shareUrl? "分享链接已保存，卡片将带二维码":"已清除分享链接");
-  });
+  $("#footPrivacy").onclick=()=>{
+    $$("#nav button").forEach(x=>x.classList.toggle("on",x.dataset.tab==="data"));
+    $$("main section").forEach(s=>s.classList.toggle("on",s.id==="data"));
+    const d=$("#foldPrivacy"); d.open=true;
+    d.scrollIntoView({behavior:"smooth",block:"center"});
+  };
 
   $$("#sexSeg button").forEach(b=>b.onclick=()=>{ $$("#sexSeg button").forEach(x=>x.classList.toggle("on",x===b)); });
   ["#fAge","#fHeight","#fAct","#fTarget","#fMode","#fPace"].forEach(s=>{
