@@ -473,11 +473,12 @@ details.adv[open] summary{margin-bottom:8px}
           <li>页面为纯静态单文件，可完全<b>离线使用</b>；断网状态下功能不受影响。</li>
           <li>清除浏览器数据、更换设备或换浏览器会导致记录丢失，请<b>定期导出 JSON 备份</b>。</li>
           <li>若在公共电脑上使用，建议用无痕窗口，离开前点击「清空全部数据」。</li>
+          <li id="liAnalytics" hidden></li>
         </ul>
       </details>
       <details class="fold"><summary>关于与免责声明</summary>
         <p style="margin:0 0 10px;font-size:13px;color:var(--sub);line-height:1.85">
-          版本 1.6 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
+          版本 1.7 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
         </p>
         <p style="margin:0;font-size:13px;color:var(--sub);line-height:1.85">
           本工具不用于预防、治疗或诊断任何疾病。使用即表示你已了解并自行承担健康决策责任。
@@ -573,6 +574,32 @@ const EX_CATS = ["常用","日常","走跑","骑行","球类","训练","水上"]
 const MEALS = ["早餐","午餐","晚餐","加餐"];
 const LS_KEY = "qingka-tracker-v1";
 const FLOOR = {f:1200, m:1500};
+/* 统计接入槽：在 Umami Cloud 或百度统计后台建站后填入对应 ID 并重新部署即生效；留空则不加载任何统计代码 */
+const ANALYTICS = { umamiId:"", baiduId:"" };
+function initAnalytics(){
+  if(ANALYTICS.umamiId){
+    const s=document.createElement("script");
+    s.src="https://cloud.umami.is/script.js"; s.defer=true;
+    s.setAttribute("data-website-id",ANALYTICS.umamiId);
+    document.head.appendChild(s);
+  }
+  if(ANALYTICS.baiduId){
+    window._hmt=window._hmt||[];
+    const s=document.createElement("script");
+    s.src="https://hm.baidu.com/hm.js?"+ANALYTICS.baiduId; s.defer=true;
+    document.head.appendChild(s);
+  }
+  if(ANALYTICS.umamiId||ANALYTICS.baiduId){
+    const li=$("#liAnalytics");
+    if(li){ li.hidden=false; li.innerHTML='本页启用<b>匿名访问统计</b>（仅统计访问量与功能使用次数，不采集任何健康数据、不用于广告）。'; }
+  }
+}
+function track(name){
+  try{
+    if(window.umami) window.umami.track(name);
+    else if(window._hmt) window._hmt.push(["_trackEvent","tizhongguanjia",name,""]);
+  }catch(e){}
+}
 
 /* ---------- 工具 ---------- */
 const $ = (s,r)=> (r||document).querySelector(s);
@@ -1031,7 +1058,7 @@ function askWeight(pre){
   const ok=()=>{
     const v=+inp.value;
     if(!v||v<20||v>300){ toast("请输入 20-300 之间的体重"); return; }
-    cur().weight=r1(v); save(); closeSheet(); renderAll(); toast("已记录 "+r1(v)+" kg");
+    cur().weight=r1(v); save(); closeSheet(); renderAll(); track("checkin_weight"); toast("已记录 "+r1(v)+" kg");
   };
   $("#wOk").onclick=ok;
   inp.onkeydown=e=>{ if(e.key==="Enter") ok(); };
@@ -1144,7 +1171,7 @@ function askFood(){
     onAdd(f,q){
       cur().foods.push({n:f.n,k:+f.k,u:f.u||"1份",q:r1(q),t:meal,time:time,c:f.c||"自定义"});
       pushRecent("recentF",f.n);
-      save(); closeSheet(); renderAll();
+      save(); closeSheet(); renderAll(); track("checkin_food");
       toast("已添加 "+f.n+" · "+r0(f.k*q)+" kcal");
     }
   });
@@ -1218,7 +1245,7 @@ function askCustomFood(){
     if($("#cfSave").checked){ S.customF=[item].concat(S.customF.filter(x=>x.n!==n)).slice(0,80); }
     pushRecent("recentF",n);
     cur().foods.push({n:n,k:r0(k),u:u,q:1,t:MEALS[guessMeal()],time:nowHM(),c:"自定义"});
-    save(); closeSheet(); renderAll(); toast("已添加 "+n+" · "+r0(k)+" kcal");
+    save(); closeSheet(); renderAll(); track("checkin_food"); toast("已添加 "+n+" · "+r0(k)+" kcal");
   };
 }
 
@@ -1252,7 +1279,7 @@ function askEx(){
       const k=r0(e.m*wNow()*(mins/60));
       cur().exs.push({n:e.n,met:e.m,k:k,mins:r0(mins),time:nowHM()});
       pushRecent("recentE",e.n);
-      save(); closeSheet(); renderAll();
+      save(); closeSheet(); renderAll(); track("checkin_ex");
       toast("已添加 "+e.n+" "+r0(mins)+"分钟 · -"+k+" kcal");
     }
   });
@@ -1312,7 +1339,7 @@ function askCustomEx(){
       S.customE=[item].concat(S.customE.filter(x=>x.n!==n)).slice(0,60);
     }
     cur().exs.push({n:n,met:met,k:k,mins:r0(mins),time:nowHM()});
-    save(); closeSheet(); renderAll(); toast("已添加 "+n+" · -"+k+" kcal");
+    save(); closeSheet(); renderAll(); track("checkin_ex"); toast("已添加 "+n+" · -"+k+" kcal");
   };
 }
 
@@ -1464,7 +1491,7 @@ function openShare(){
     const a=document.createElement("a");
     a.href=data; a.download="体重管家_"+today()+".png";
     document.body.appendChild(a); a.click(); a.remove();
-    toast("卡片已保存");
+    track("share_save"); toast("卡片已保存");
   };
 }
 
@@ -1489,11 +1516,11 @@ function exportCsv(){
     return /[",\n]/.test(s)? '"'+s.replace(/"/g,'""')+'"' : s;
   }).join(",")).join("\r\n");
   download("体重管家_"+today()+".csv",csv,"text/csv;charset=utf-8");
-  toast("CSV 已导出（"+(rows.length-1)+" 行）");
+  track("export_csv"); toast("CSV 已导出（"+(rows.length-1)+" 行）");
 }
 function exportJson(){
   download("体重管家备份_"+today()+".json",JSON.stringify(S,null,2),"application/json");
-  toast("JSON 备份已导出");
+  track("export_json"); toast("JSON 备份已导出");
 }
 function importJson(file){
   const rd=new FileReader();
@@ -1586,6 +1613,7 @@ function bind(){
 
 /* ---------- 启动 ---------- */
 bind();
+initAnalytics();
 renderAll();
 </script>
 </body>
