@@ -1,6 +1,6 @@
 {
-  "name": "体重小记 · 体重与热量管理工具",
-  "short_name": "体重小记",
+  "name": "体重管家 · 体重与热量管理工具",
+  "short_name": "体重管家",
   "description": "本地隐私优先的体重与热量管理工具：数据只存你自己的设备。",
   "lang": "zh-CN",
   "start_url": ".",
@@ -9,7 +9,8 @@
   "background_color": "#f5f7f8",
   "theme_color": "#12a594",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "icon-192.png?v=1.6", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png?v=1.6", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png?v=1.6", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
