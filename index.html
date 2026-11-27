@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12a594">
-<meta name="description" content="体重小记 - 本地隐私优先的体重与热量管理工具：记体重、算热量、稳维持，数据只存你自己的设备。">
-<meta property="og:title" content="体重小记 · 体重与热量管理工具">
+<meta name="description" content="体重管家 - 本地隐私优先的体重与热量管理工具：记体重、算热量、稳维持，数据只存你自己的设备。">
+<meta property="og:title" content="体重管家 · 体重与热量管理工具">
 <meta property="og:description" content="本地优先、无账号无广告的健康打卡工具：体重曲线、热量收支、维持计划，数据只存你自己的设备。">
 <meta property="og:type" content="website">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>体重小记 · 体重与热量管理工具</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1.6">
+<title>体重管家 · 体重与热量管理工具</title>
 <style>
 :root{
   --bg:#f5f7f8; --card:#ffffff; --ink:#1b2430; --sub:#7c8899; --line:#e9edf1;
@@ -259,7 +260,7 @@ details.adv[open] summary{margin-bottom:8px}
 <header>
   <div class="wrap">
     <div class="hrow">
-      <div class="brand"><span class="logo">记</span>体重小记<small>记体重 · 算热量 · 稳维持</small></div>
+      <div class="brand"><span class="logo">管</span>体重管家<small>记体重 · 算热量 · 稳维持</small></div>
       <div class="streak" id="streak" title="连续打卡天数">🔥 0 天</div>
     </div>
     <nav id="nav">
@@ -476,7 +477,7 @@ details.adv[open] summary{margin-bottom:8px}
       </details>
       <details class="fold"><summary>关于与免责声明</summary>
         <p style="margin:0 0 10px;font-size:13px;color:var(--sub);line-height:1.85">
-          版本 1.5 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
+          版本 1.6 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
         </p>
         <p style="margin:0;font-size:13px;color:var(--sub);line-height:1.85">
           本工具不用于预防、治疗或诊断任何疾病。使用即表示你已了解并自行承担健康决策责任。
@@ -493,7 +494,7 @@ details.adv[open] summary{margin-bottom:8px}
 </main>
 
 <footer class="wrap">
-  体重小记 · 数据仅存本机 · 非医疗器械，不构成医疗建议<br>
+  体重管家 · 数据仅存本机 · 非医疗器械，不构成医疗建议<br>
   <button class="flink" id="footPrivacy">隐私与免责声明</button>
 </footer>
 
@@ -508,7 +509,7 @@ var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=ne
 <script>
 "use strict";
 /* =========================================================
-   体重小记 v1.5  —  零依赖 / 本地存储 / 单文件
+   体重管家 v1.5  —  零依赖 / 本地存储 / 单文件
    ========================================================= */
 
 /* ---------- 食物库（kcal / 单位）---------- */
@@ -1358,9 +1359,9 @@ function shareCardCanvas(){
 
   rr(x,60,60,68,68,18); x.fillStyle="#fff"; x.fill();
   x.fillStyle="#0d7d70"; x.font="800 40px "+F; x.textAlign="center"; x.textBaseline="middle";
-  x.fillText("记",94,96);
+  x.fillText("管",94,96);
   x.textAlign="left";
-  x.fillStyle="#fff"; x.font="700 42px "+F; x.fillText("体重小记",148,84);
+  x.fillStyle="#fff"; x.font="700 42px "+F; x.fillText("体重管家",148,84);
   x.fillStyle="rgba(255,255,255,.72)"; x.font="400 24px "+F; x.fillText("记体重 · 算热量 · 稳维持",148,120);
   x.textAlign="right"; x.fillStyle="rgba(255,255,255,.72)"; x.font="400 24px "+F; x.fillText(today(),690,94);
 
@@ -1432,7 +1433,7 @@ function shareCardCanvas(){
 function shareCardFooterText(x,F){
   x.textAlign="center";
   x.fillStyle="#0d7d70"; x.font="700 34px "+F; x.fillText("数据只存本机 · 无账号 · 无广告",375,862);
-  x.fillStyle="#7c8899"; x.font="400 24px "+F; x.fillText("体重小记 · 你的体重与热量管理工具",375,902);
+  x.fillStyle="#7c8899"; x.font="400 24px "+F; x.fillText("体重管家 · 你的体重与热量管理工具",375,902);
   x.textAlign="left";
 }
 function openShare(){
@@ -1461,7 +1462,7 @@ function openShare(){
   $("#scClose").onclick=closeSheet;
   $("#scSave").onclick=()=>{
     const a=document.createElement("a");
-    a.href=data; a.download="体重小记_"+today()+".png";
+    a.href=data; a.download="体重管家_"+today()+".png";
     document.body.appendChild(a); a.click(); a.remove();
     toast("卡片已保存");
   };
@@ -1487,11 +1488,11 @@ function exportCsv(){
     const s=String(c==null?"":c);
     return /[",\n]/.test(s)? '"'+s.replace(/"/g,'""')+'"' : s;
   }).join(",")).join("\r\n");
-  download("体重小记_"+today()+".csv",csv,"text/csv;charset=utf-8");
+  download("体重管家_"+today()+".csv",csv,"text/csv;charset=utf-8");
   toast("CSV 已导出（"+(rows.length-1)+" 行）");
 }
 function exportJson(){
-  download("体重小记备份_"+today()+".json",JSON.stringify(S,null,2),"application/json");
+  download("体重管家备份_"+today()+".json",JSON.stringify(S,null,2),"application/json");
   toast("JSON 备份已导出");
 }
 function importJson(file){
