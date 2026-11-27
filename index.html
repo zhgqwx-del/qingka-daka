@@ -478,12 +478,18 @@ details.adv[open] summary{margin-bottom:8px}
       </details>
       <details class="fold"><summary>关于与免责声明</summary>
         <p style="margin:0 0 10px;font-size:13px;color:var(--sub);line-height:1.85">
-          版本 1.7 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
+          版本 1.8 · 零依赖单文件应用。食物热量与运动消耗数据为通用公开营养学近似值，实际会因品种、产地、烹饪方式、个人体质与动作强度产生差异，估算结果<b>可能与真实值相差 ±20%</b>，请把它当作趋势参考而非精确计量。
         </p>
         <p style="margin:0;font-size:13px;color:var(--sub);line-height:1.85">
           本工具不用于预防、治疗或诊断任何疾病。使用即表示你已了解并自行承担健康决策责任。
         </p>
       </details>
+    </div>
+
+    <div class="card" id="msgCard" hidden>
+      <div class="sec-head"><div class="t"><h2>💬 反馈留言</h2><p class="hint">留言与匿名编号一起发送，仅开发者可见</p></div></div>
+      <textarea class="note" id="msgBox" placeholder="想加的功能、遇到的问题、想说的话…"></textarea>
+      <div class="rowbtns" style="margin-top:10px"><button class="btn soft" id="btnMsg">发送留言</button></div>
     </div>
 
     <div class="card">
@@ -575,7 +581,20 @@ const MEALS = ["早餐","午餐","晚餐","加餐"];
 const LS_KEY = "qingka-tracker-v1";
 const FLOOR = {f:1200, m:1500};
 /* 统计接入槽：在 Umami Cloud 或百度统计后台建站后填入对应 ID 并重新部署即生效；留空则不加载任何统计代码 */
-const ANALYTICS = { umamiId:"", baiduId:"" };
+/* backend：自建 Cloudflare Workers 统计后端地址（见 backend/ 目录），填入后启用匿名 ping 与留言 */
+const ANALYTICS = { umamiId:"", baiduId:"", backend:"" };
+function aid(){
+  let a=localStorage.getItem("tjg_aid");
+  if(!a){ a="a"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); localStorage.setItem("tjg_aid",a); }
+  return a;
+}
+function ping(ev){
+  if(!ANALYTICS.backend) return;
+  try{
+    navigator.sendBeacon(ANALYTICS.backend+"/ping",
+      new Blob([JSON.stringify({aid:aid(),ev:ev,v:"1.8"})],{type:"application/json"}));
+  }catch(e){}
+}
 function initAnalytics(){
   if(ANALYTICS.umamiId){
     const s=document.createElement("script");
@@ -589,12 +608,17 @@ function initAnalytics(){
     s.src="https://hm.baidu.com/hm.js?"+ANALYTICS.baiduId; s.defer=true;
     document.head.appendChild(s);
   }
-  if(ANALYTICS.umamiId||ANALYTICS.baiduId){
+  if(ANALYTICS.backend){
+    ping("visit");
+    const mc=$("#msgCard"); if(mc) mc.hidden=false;
+  }
+  if(ANALYTICS.umamiId||ANALYTICS.baiduId||ANALYTICS.backend){
     const li=$("#liAnalytics");
     if(li){ li.hidden=false; li.innerHTML='本页启用<b>匿名访问统计</b>（仅统计访问量与功能使用次数，不采集任何健康数据、不用于广告）。'; }
   }
 }
 function track(name){
+  ping(name);
   try{
     if(window.umami) window.umami.track(name);
     else if(window._hmt) window._hmt.push(["_trackEvent","tizhongguanjia",name,""]);
@@ -1598,6 +1622,16 @@ function bind(){
 
   $("#btnCsv").onclick=exportCsv;
   $("#btnJson").onclick=exportJson;
+  $("#btnMsg").onclick=()=>{
+    const t=$("#msgBox").value.trim();
+    if(!t){ toast("先写点内容吧"); return; }
+    if(!ANALYTICS.backend){ toast("留言通道未启用"); return; }
+    try{
+      navigator.sendBeacon(ANALYTICS.backend+"/msg",
+        new Blob([JSON.stringify({aid:aid(),text:t})],{type:"application/json"}));
+      $("#msgBox").value=""; track("msg_send"); toast("留言已送达，谢谢！");
+    }catch(e){ toast("发送失败，请稍后再试"); }
+  };
   $("#btnImport").onclick=()=>$("#fileIn").click();
   $("#fileIn").onchange=e=>{ if(e.target.files[0]) importJson(e.target.files[0]); e.target.value=""; };
   $("#btnWipe").onclick=wipe;
