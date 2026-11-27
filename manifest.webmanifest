@@ -1,0 +1,15 @@
+{
+  "name": "轻卡打卡 · 体重与热量管理",
+  "short_name": "轻卡打卡",
+  "description": "本地隐私优先的体重与热量管理工具：数据只存你自己的设备。",
+  "lang": "zh-CN",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f5f7f8",
+  "theme_color": "#12a594",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
